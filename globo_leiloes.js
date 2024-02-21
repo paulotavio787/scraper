@@ -31,10 +31,6 @@ async function scrapeDynamicContent(baseUrl, categorias) {
       "--disable-gpu",
       "--disable-images",
     ],
-    executablePath:
-      process.env.NODE_ENV === "production"
-        ? process.env.PUPPETEER_EXECUTABLE_PATH
-        : puppeteer.executablePath(),
   });
   const page = await browser.newPage();
   await page.setRequestInterception(true);
