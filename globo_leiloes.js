@@ -5,14 +5,14 @@ const categorias = [...new Set([
   "Apartamento", "Cobertura", "Fazenda", "Gleba",
   "Chácara", "Sítio", "Sala", "Escritório", "Galpão"
 ])];
-
-async function scrapeDynamicContent(baseUrl, categorias) {
+const options = {
+  timeout: 60000,
+  headless: true, // Garante que está em modo headless
+  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--disable-gpu', '--disable-images'] // Desabilita imagens e recursos desnecessários
+}
+async function scrapeDynamicContent(baseUrl, categorias, browserOptions) {
   console.time("ScrapingExecutionTime");
-  const browser = await puppeteer.launch({
-    timeout: 60000,
-    headless: true, // Garante que está em modo headless
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--disable-gpu', '--disable-images'] // Desabilita imagens e recursos desnecessários
-  });
+  const browser = await puppeteer.launch(browserOptions);
   const page = await browser.newPage();
   await page.setRequestInterception(true);
   page.on('request', (req) => {
@@ -25,7 +25,7 @@ async function scrapeDynamicContent(baseUrl, categorias) {
   let currentPage = 1;
   let results = [];
 
-  while (true) {
+  // while (true) {
     const url = `${baseUrl}?pagina=${currentPage}`;
     await page.goto(url, { waitUntil: "networkidle2" });
 
@@ -59,9 +59,9 @@ async function scrapeDynamicContent(baseUrl, categorias) {
       return Boolean(nextPageButton) && !nextPageButton.classList.contains("disabled");
     });
 
-    if (!hasNextPage) break;
-    currentPage++;
-  }
+  //   if (!hasNextPage) break;
+  //   currentPage++;
+  // }
 
   await browser.close();
 
@@ -71,7 +71,7 @@ async function scrapeDynamicContent(baseUrl, categorias) {
 }
 
 async function processItemsInBatches(results, browserPromise) {
-  const concurrentLimit = 20;
+  const concurrentLimit = 5;
   const browser = await browserPromise;
   
   for (let i = 0; i < results.length; i += concurrentLimit) {
@@ -106,7 +106,7 @@ async function processItemDetail(item, browser) {
 }
 
 const baseUrl = "https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades/";
-scrapeDynamicContent(baseUrl, categorias)
+scrapeDynamicContent(baseUrl, categorias, options)
   .then(data => console.log(data[0]))
   .catch(error => console.error("Scraping failed:", error));
 

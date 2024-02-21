@@ -1,26 +1,54 @@
-const { scrapeDynamicContent } = require('./globo_leiloes');
+const app = require("express")();
+const { scrapeDynamicContent } = require('./globo_leiloes'); 
 
-async function main() {
-  console.log("Iniciando scraping...");
+let chrome = {};
+let puppeteer;
 
-  // Defina a URL base e categorias para o scraper de leilões da Globo
-  const baseUrl = "https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades/";
+if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+  chrome = require("chrome-aws-lambda");
+  puppeteer = require("puppeteer-core");
+} else {
+  puppeteer = require("puppeteer");
+}
+
+app.get("/api", async (req, res) => {
+  let options = {};
+
+  if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+    options = {
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-accelerated-2d-canvas",
+        "--disable-gpu",
+        "--disable-images",
+      ],
+      defaultViewport: chrome.defaultViewport,
+      executablePath: await chrome.executablePath,
+      headless: true,
+      ignoreHTTPSErrors: true,
+      timeout: 60000,
+    };
+  }
+
   const categorias = [...new Set([
     "Terreno", "Lote", "Vaga de Garagem", "Casa", "Sobrado",
     "Apartamento", "Cobertura", "Fazenda", "Gleba",
     "Chácara", "Sítio", "Sala", "Escritório", "Galpão"
   ])];
-
-  // Executar o scraper de leilões da Globo
+  const baseUrl = "https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades/";
   try {
-    const results = await scrapeDynamicContent(baseUrl, categorias);
-    console.log(`Scraping concluído. Total de itens raspados: ${results.length}`);
-    // Faça algo com os resultados, como salvar em um banco de dados
-  } catch (error) {
-    console.error("Erro durante o scraping:", error);
+    const results = await scrapeDynamicContent(baseUrl, categorias, options)
+    res.status(200).json(results)
+  } catch (err) {
+    console.error(err);
+    return null;
   }
+});
 
-  // Aqui você pode adicionar chamadas para outros scrapers seguindo a mesma estrutura
-}
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server started");
+});
 
-main().then(() => console.log("Todos os scrapings foram concluídos."));
+module.exports = app;
