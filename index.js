@@ -39,8 +39,11 @@ app.get("/api", async (req, res) => {
   ])];
   const baseUrl = "https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades/";
   try {
-    const results = await scrapeDynamicContent(baseUrl, categorias, options)
-    res.status(200).json(results)
+    let browser = await puppeteer.launch(options);
+
+    let page = await browser.newPage();
+    await page.goto("https://www.google.com");
+    res.send(await page.title());
   } catch (err) {
     console.error(err);
     return null;
