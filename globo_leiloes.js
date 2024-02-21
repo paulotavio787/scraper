@@ -25,7 +25,7 @@ async function scrapeDynamicContent(baseUrl, categorias) {
   let currentPage = 1;
   let results = [];
 
-  // while (true) {
+  while (true) {
     const url = `${baseUrl}?pagina=${currentPage}`;
     await page.goto(url, { waitUntil: "networkidle2" });
 
@@ -59,9 +59,9 @@ async function scrapeDynamicContent(baseUrl, categorias) {
       return Boolean(nextPageButton) && !nextPageButton.classList.contains("disabled");
     });
 
-  //   if (!hasNextPage) break;
-  //   currentPage++;
-  // }
+    if (!hasNextPage) break;
+    currentPage++;
+  }
 
   await browser.close();
 
