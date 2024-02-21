@@ -1,5 +1,5 @@
 const app = require("express")();
-const { scrapeDynamicContent } = require('./globo_leiloes'); 
+// const { scrapeDynamicContent } = require('./globo_leiloes'); 
 
 let chrome = {};
 let puppeteer;
