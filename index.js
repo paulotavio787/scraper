@@ -13,24 +13,13 @@ app.get("/", async (req, res) => {
   try {
     console.time("ScrapingExecutionTime");
 
-    const result = await scrapeDynamicContent(baseUrl, categorias);
-    res.status(200).json(result)
+    // const result = await scrapeDynamicContent(baseUrl, categorias);
+    // res.status(200).json(result)
 
-    // const browser = await puppeteer.launch({
-    //     args: [
-    //       "--disable-setuid-sandbox",
-    //       "--no-sandbox",
-    //       "--single-process",
-    //       "--no-zygote",
-    //     ],
-    //     executablePath:
-    //       process.env.NODE_ENV === "production"
-    //         ? process.env.PUPPETEER_EXECUTABLE_PATH
-    //         : puppeteer.executablePath(),
-    //   });
-    // let page = await browser.newPage();
-    // await page.goto("https://www.google.com");
-    // res.send(await page.title());
+    const browser = await puppeteer.launch();
+    let page = await browser.newPage();
+    await page.goto("https://www.google.com");
+    res.send(await page.title());
     console.timeEnd("ScrapingExecutionTime");
 
   } catch (err) {
