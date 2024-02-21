@@ -1,3 +1,5 @@
 node_modules
 package-lock.json
 vercel_test.js
+render_test.js
+vercel_test.js
