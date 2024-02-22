@@ -100,7 +100,7 @@ async function scrapeDynamicContent(baseUrl, categorias) {
 
   await browser.close();
 
-  await processItemsInBatches(results, puppeteer.launch());
+  // await processItemsInBatches(results, puppeteer.launch());
   return results;
 }
 
