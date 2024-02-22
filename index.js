@@ -28,6 +28,7 @@ app.get("/", async (req, res) => {
     console.time("ScrapingExecutionTime");
 
     const result = await scrapeDynamicContent(baseUrl, categorias);
+    console.log(result[0])
     res.status(200).json(result)
 
     // const browser = await puppeteer.launch({
