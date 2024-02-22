@@ -27,30 +27,30 @@ app.get("/", async (req, res) => {
   try {
     console.time("ScrapingExecutionTime");
 
-    // const result = await scrapeDynamicContent(baseUrl, categorias);
-    // res.status(200).json(result)
+    const result = await scrapeDynamicContent(baseUrl, categorias);
+    res.status(200).json(result)
 
-    const browser = await puppeteer.launch({
-      timeout: 60000,
-      headless: true, // Garante que está em modo headless
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-accelerated-2d-canvas",
-        "--disable-gpu",
-        "--disable-images",
-        // "--single-process",
-        // "--no-zygote",
-      ],
-      executablePath:
-        process.env.NODE_ENV === "production"
-          ? process.env.PUPPETEER_EXECUTABLE_PATH
-          : puppeteer.executablePath(),
-    });
-    let page = await browser.newPage();
-    await page.goto("https://www.google.com");
-    res.send(await page.title());
+    // const browser = await puppeteer.launch({
+    //   timeout: 60000,
+    //   headless: true, // Garante que está em modo headless
+    //   args: [
+    //     "--no-sandbox",
+    //     "--disable-setuid-sandbox",
+    //     "--disable-dev-shm-usage",
+    //     "--disable-accelerated-2d-canvas",
+    //     "--disable-gpu",
+    //     "--disable-images",
+    //     // "--single-process",
+    //     // "--no-zygote",
+    //   ],
+    //   executablePath:
+    //     process.env.NODE_ENV === "production"
+    //       ? process.env.PUPPETEER_EXECUTABLE_PATH
+    //       : puppeteer.executablePath(),
+    // });
+    // let page = await browser.newPage();
+    // await page.goto("https://www.google.com");
+    // res.send(await page.title());
     console.timeEnd("ScrapingExecutionTime");
   } catch (err) {
     console.error(err);
