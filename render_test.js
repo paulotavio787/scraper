@@ -8,6 +8,7 @@ const scrapeLogic = async (res) => {
   const baseUrl = "https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades/";
 
   puppeteer.launch({
+    headless: false,
     args: ['--disable-setuid-sandbox', '--no-sandbox'],
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
   }).then(async browser => {
