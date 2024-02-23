@@ -15,7 +15,7 @@ const scrapeLogic = async (res) => {
       const page = await browser.newPage();
 
       // Navega para a URL
-      await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+      await page.goto(baseUrl, { waitUntil: 'networkidle0' });
       await page.waitForFunction(
         'document.title != "Just a moment..."',
         { timeout: 10000 }
