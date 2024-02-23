@@ -37,25 +37,25 @@ const scrapeLogic = async (res) => {
   });
   try {
     const page = await browser.newPage();
-    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
     await page.setRequestInterception(true);
-    // page.on("request", (req) => {
-    //   if (
-    //     req.resourceType() === "stylesheet" ||
-    //     req.resourceType() === "font" ||
-    //     req.resourceType() === "image"
-    //   ) {
-    //     req.abort();
-    //   } else {
-    //     req.continue();
-    //   }
-    // });
+    page.on("request", (req) => {
+      if (
+        req.resourceType() === "stylesheet" ||
+        req.resourceType() === "font" ||
+        req.resourceType() === "image"
+      ) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
     let currentPage = 1;
     let results = [];
 
     // while (true) {
     const url = `${baseUrl}?pagina=${currentPage}`;
     await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.setViewport({ width: 1080, height: 1024 });
 
     const items = await page.title()
 
