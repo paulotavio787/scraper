@@ -54,7 +54,7 @@ const scrapeLogic = async (res) => {
 
     // while (true) {
     const url = `${baseUrl}?pagina=${currentPage}`;
-    await page.goto(url, { waitUntil: "networkidle2" });
+    await page.goto(url, { waitUntil: "domcontentloaded" });
 
     const items = await page.evaluate((categorias) => {
       return Array.from(document.querySelectorAll("div.item")).map((node) => {
