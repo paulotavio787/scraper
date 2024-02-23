@@ -1,5 +1,5 @@
 const app = require("express")();
-const puppeteer = require('puppeteer');
+const puppeteer = require("puppeteer");
 const { scrapeDynamicContent } = require("./globo_leiloes");
 
 app.get("/", async (req, res) => {
@@ -28,31 +28,38 @@ app.get("/", async (req, res) => {
     console.time("ScrapingExecutionTime");
 
     const result = await scrapeDynamicContent(baseUrl, categorias);
-    console.log(result[0])
-    res.status(200).json(result)
-
-    // const browser = await puppeteer.launch({
-    //   timeout: 60000,
-    //   headless: true, // Garante que está em modo headless
-    //   args: [
-    //     "--no-sandbox",
-    //     "--disable-setuid-sandbox",
-    //     "--disable-dev-shm-usage",
-    //     "--disable-accelerated-2d-canvas",
-    //     "--disable-gpu",
-    //     "--disable-images",
-    //     // "--single-process",
-    //     // "--no-zygote",
-    //   ],
-    //   executablePath:
-    //     process.env.NODE_ENV === "production"
-    //       ? process.env.PUPPETEER_EXECUTABLE_PATH
-    //       : puppeteer.executablePath(),
-    // });
-    // let page = await browser.newPage();
-    // await page.goto("https://www.google.com");
-    // res.send(await page.title());
+    console.log(result[0]);
+    res.status(200).json(result);
     console.timeEnd("ScrapingExecutionTime");
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+});
+
+app.get("/google", async (req, res) => {
+  try {
+    const browser = await puppeteer.launch({
+      timeout: 60000,
+      headless: true, // Garante que está em modo headless
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-accelerated-2d-canvas",
+        "--disable-gpu",
+        "--disable-images",
+        // "--single-process",
+        // "--no-zygote",
+      ],
+      executablePath:
+        process.env.NODE_ENV === "production"
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath(),
+    });
+    let page = await browser.newPage();
+    await page.goto("https://www.google.com");
+    res.send(await page.title());
   } catch (err) {
     console.error(err);
     return null;
