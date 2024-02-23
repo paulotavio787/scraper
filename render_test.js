@@ -2,12 +2,33 @@ const puppeteer = require("puppeteer");
 require("dotenv").config();
 
 const scrapeLogic = async (res) => {
+  const categorias = [
+    ...new Set([
+      "Terreno",
+      "Lote",
+      "Vaga de Garagem",
+      "Casa",
+      "Sobrado",
+      "Apartamento",
+      "Cobertura",
+      "Fazenda",
+      "Gleba",
+      "Chácara",
+      "Sítio",
+      "Sala",
+      "Escritório",
+      "Galpão",
+    ]),
+  ];
+  const baseUrl =
+    "https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades/";
+
   const browser = await puppeteer.launch({
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
-      "--single-process",
-      "--no-zygote",
+      //   "--single-process",
+      //   "--no-zygote",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
@@ -16,30 +37,62 @@ const scrapeLogic = async (res) => {
   });
   try {
     const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      if (
+        req.resourceType() === "stylesheet" ||
+        req.resourceType() === "font" ||
+        req.resourceType() === "image"
+      ) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
+    let currentPage = 1;
+    let results = [];
 
-    await page.goto("https://developer.chrome.com/");
+    // while (true) {
+    const url = `${baseUrl}?pagina=${currentPage}`;
+    await page.goto(url, { waitUntil: "networkidle2" });
 
-    // Set screen size
-    await page.setViewport({ width: 1080, height: 1024 });
+    const items = await page.evaluate((categorias) => {
+      return Array.from(document.querySelectorAll("div.item")).map((node) => {
+        const title = node.querySelector("h3").innerText;
+        const auctionType = node.querySelector("h5").innerText;
+        const propertyType =
+          categorias.find((categoria) => title.includes(categoria)) || "Outro";
+        const link = node.querySelector("a").href;
+        const pElements = node.querySelectorAll("p");
+        const datas = [];
+        let lanceMinimo = "";
 
-    // Type into search box
-    await page.type(".search-box__input", "automate beyond recorder");
+        pElements.forEach((p) => {
+          const text = p.innerText;
+          const dateMatch = text.match(/\d{2}\/\d{2}\/\d{4}/);
+          if (dateMatch) datas.push(dateMatch[0]);
 
-    // Wait and click on first result
-    const searchResultSelector = ".search-box__link";
-    await page.waitForSelector(searchResultSelector);
-    await page.click(searchResultSelector);
+          const lanceMatch = text.match(/R\$ [\d\.,]+/);
+          if (lanceMatch && !lanceMinimo) lanceMinimo = lanceMatch[0];
+        });
 
-    // Locate the full title with a unique string
-    const textSelector = await page.waitForSelector(
-      "text/Customize and automate"
-    );
-    const fullTitle = await textSelector.evaluate((el) => el.textContent);
+        return { title, auctionType, propertyType, datas, lanceMinimo, link };
+      });
+    }, categorias);
 
-    // Print the full title
-    const logStatement = `The title of this blog post is ${fullTitle}`;
-    console.log(logStatement);
-    res.send(logStatement);
+    results = [...results, ...items];
+
+    const hasNextPage = await page.evaluate(() => {
+      const nextPageButton = document.querySelector(
+        'a[href*="pagina="]:last-of-type'
+      );
+      return (
+        Boolean(nextPageButton) &&
+        !nextPageButton.classList.contains("disabled")
+      );
+    });
+    console.log(results);
+    res.status(200).json(results);
   } catch (e) {
     console.error(e);
     res.send(`Something went wrong while running Puppeteer: ${e}`);

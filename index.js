@@ -1,6 +1,7 @@
 const app = require("express")();
 const puppeteer = require("puppeteer");
 const { scrapeDynamicContent } = require("./globo_leiloes");
+const { scrapeLogic } = require("./render_test");
 
 app.get("/", async (req, res) => {
   const categorias = [
@@ -65,6 +66,15 @@ app.get("/google", async (req, res) => {
     return null;
   }
 });
+
+app.get("/test", async (req, res) => {
+    try {
+        scrapeLogic(res);
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  });
 
 app.listen(process.env.PORT || 4000, () => {
   console.log("Server started");
