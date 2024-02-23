@@ -1,89 +1,35 @@
-const puppeteer = require("puppeteer");
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin());
+
 require("dotenv").config();
 
 const scrapeLogic = async (res) => {
-  const categorias = [
-    ...new Set([
-      "Terreno",
-      "Lote",
-      "Vaga de Garagem",
-      "Casa",
-      "Sobrado",
-      "Apartamento",
-      "Cobertura",
-      "Fazenda",
-      "Gleba",
-      "Chácara",
-      "Sítio",
-      "Sala",
-      "Escritório",
-      "Galpão",
-    ]),
-  ];
-  const baseUrl =
-    "https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades/";
+  const baseUrl = "https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades/";
 
-  const browser = await puppeteer.launch({
-    args: [
-      "--disable-setuid-sandbox",
-      "--no-sandbox",
-        // "--single-process",
-        // "--no-zygote",
-    ],
-    executablePath:
-      process.env.NODE_ENV === "production"
-        ? process.env.PUPPETEER_EXECUTABLE_PATH
-        : puppeteer.executablePath(),
+  puppeteer.launch({
+    args: ['--disable-setuid-sandbox', '--no-sandbox'],
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
+  }).then(async browser => {
+    try {
+      const page = await browser.newPage();
+
+      // Navega para a URL
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+
+      // Captura o título da página para verificar se o scraping foi bem-sucedido
+      const title = await page.title();
+      const results = [{ title: title }];
+
+      console.log(results);
+      res.status(200).json(results);
+    } catch (e) {
+      console.error(e);
+      res.status(500).send(`Something went wrong while running Puppeteer: ${e}`);
+    } finally {
+      await browser.close();
+    }
   });
-  try {
-    const page = await browser.newPage();
-    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
-    // await page.setRequestInterception(true);
-    // page.on("request", (req) => {
-    //   if (
-    //     req.resourceType() === "stylesheet" ||
-    //     req.resourceType() === "font" ||
-    //     req.resourceType() === "image"
-    //   ) {
-    //     req.abort();
-    //   } else {
-    //     req.continue();
-    //   }
-    // });
-    let currentPage = 1;
-    let results = [];
-
-    // while (true) {
-    const url = `${baseUrl}?pagina=${currentPage}`;
-    await page.goto(url, { waitUntil: "domcontentloaded" });
-    await page.setViewport({ width: 1080, height: 1024 });
-
-    const items = await page.title()
-
-    results = [{title: items}];
-
-    // const hasNextPage = await page.evaluate(() => {
-    //   const nextPageButton = document.querySelector(
-    //     'a[href*="pagina="]:last-of-type'
-    //   );
-    //   return (
-    //     Boolean(nextPageButton) &&
-    //     !nextPageButton.classList.contains("disabled")
-    //   );
-    // });
-
-    //   if (!hasNextPage) break;
-    //   currentPage++;
-    // }
-
-    console.log(results);
-    res.status(200).json(results);
-  } catch (e) {
-    console.error(e);
-    res.send(`Something went wrong while running Puppeteer: ${e}`);
-  } finally {
-    await browser.close();
-  }
 };
 
 module.exports = { scrapeLogic };
