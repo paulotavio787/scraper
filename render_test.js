@@ -16,6 +16,10 @@ const scrapeLogic = async (res) => {
 
       // Navega para a URL
       await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+      await page.waitForFunction(
+        'document.title != "Just a moment..."',
+        { timeout: 10000 }
+      );
 
       // Captura o título da página para verificar se o scraping foi bem-sucedido
       const title = await page.title();
