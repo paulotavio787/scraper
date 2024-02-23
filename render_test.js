@@ -27,8 +27,8 @@ const scrapeLogic = async (res) => {
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
-        "--single-process",
-        "--no-zygote",
+        // "--single-process",
+        // "--no-zygote",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
@@ -56,41 +56,19 @@ const scrapeLogic = async (res) => {
     const url = `${baseUrl}?pagina=${currentPage}`;
     await page.goto(url, { waitUntil: "domcontentloaded" });
 
-    const items = await page.evaluate((categorias) => {
-      return Array.from(document.querySelectorAll("div.item")).map((node) => {
-        const title = node.querySelector("h3").innerText;
-        const auctionType = node.querySelector("h5").innerText;
-        const propertyType =
-          categorias.find((categoria) => title.includes(categoria)) || "Outro";
-        const link = node.querySelector("a").href;
-        const pElements = node.querySelectorAll("p");
-        const datas = [];
-        let lanceMinimo = "";
+    const items = await page.title()
 
-        pElements.forEach((p) => {
-          const text = p.innerText;
-          const dateMatch = text.match(/\d{2}\/\d{2}\/\d{4}/);
-          if (dateMatch) datas.push(dateMatch[0]);
+    results = [{title: items}];
 
-          const lanceMatch = text.match(/R\$ [\d\.,]+/);
-          if (lanceMatch && !lanceMinimo) lanceMinimo = lanceMatch[0];
-        });
-
-        return { title, auctionType, propertyType, datas, lanceMinimo, link };
-      });
-    }, categorias);
-
-    results = [...results, ...items];
-
-    const hasNextPage = await page.evaluate(() => {
-      const nextPageButton = document.querySelector(
-        'a[href*="pagina="]:last-of-type'
-      );
-      return (
-        Boolean(nextPageButton) &&
-        !nextPageButton.classList.contains("disabled")
-      );
-    });
+    // const hasNextPage = await page.evaluate(() => {
+    //   const nextPageButton = document.querySelector(
+    //     'a[href*="pagina="]:last-of-type'
+    //   );
+    //   return (
+    //     Boolean(nextPageButton) &&
+    //     !nextPageButton.classList.contains("disabled")
+    //   );
+    // });
 
     //   if (!hasNextPage) break;
     //   currentPage++;
