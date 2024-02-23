@@ -27,8 +27,8 @@ const scrapeLogic = async (res) => {
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
-      //   "--single-process",
-      //   "--no-zygote",
+        "--single-process",
+        "--no-zygote",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
@@ -91,6 +91,11 @@ const scrapeLogic = async (res) => {
         !nextPageButton.classList.contains("disabled")
       );
     });
+
+    //   if (!hasNextPage) break;
+    //   currentPage++;
+    // }
+
     console.log(results);
     res.status(200).json(results);
   } catch (e) {

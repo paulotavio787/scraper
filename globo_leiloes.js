@@ -31,8 +31,8 @@ async function scrapeDynamicContent(baseUrl, categorias) {
       "--disable-accelerated-2d-canvas",
       "--disable-gpu",
       "--disable-images",
-      // "--single-process",
-      // "--no-zygote",
+      "--single-process",
+      "--no-zygote",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
