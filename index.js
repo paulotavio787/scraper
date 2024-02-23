@@ -3,40 +3,40 @@ const puppeteer = require("puppeteer");
 const { scrapeDynamicContent } = require("./globo_leiloes");
 const { scrapeLogic } = require("./render_test");
 
-app.get("/", async (req, res) => {
-  const categorias = [
-    ...new Set([
-      "Terreno",
-      "Lote",
-      "Vaga de Garagem",
-      "Casa",
-      "Sobrado",
-      "Apartamento",
-      "Cobertura",
-      "Fazenda",
-      "Gleba",
-      "Chácara",
-      "Sítio",
-      "Sala",
-      "Escritório",
-      "Galpão",
-    ]),
-  ];
-  const baseUrl =
-    "https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades/";
+// app.get("/", async (req, res) => {
+//   const categorias = [
+//     ...new Set([
+//       "Terreno",
+//       "Lote",
+//       "Vaga de Garagem",
+//       "Casa",
+//       "Sobrado",
+//       "Apartamento",
+//       "Cobertura",
+//       "Fazenda",
+//       "Gleba",
+//       "Chácara",
+//       "Sítio",
+//       "Sala",
+//       "Escritório",
+//       "Galpão",
+//     ]),
+//   ];
+//   const baseUrl =
+//     "https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades/";
 
-  try {
-    console.time("ScrapingExecutionTime");
+//   try {
+//     console.time("ScrapingExecutionTime");
 
-    const result = await scrapeDynamicContent(baseUrl, categorias);
-    console.log(result[0]);
-    res.status(200).json(result);
-    console.timeEnd("ScrapingExecutionTime");
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
-});
+//     const result = await scrapeDynamicContent(baseUrl, categorias);
+//     console.log(result[0]);
+//     res.status(200).json(result);
+//     console.timeEnd("ScrapingExecutionTime");
+//   } catch (err) {
+//     console.error(err);
+//     return null;
+//   }
+// });
 
 app.get("/google", async (req, res) => {
   try {
