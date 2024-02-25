@@ -59,7 +59,7 @@ app.get("/google", async (req, res) => {
           : puppeteer.executablePath(),
     });
     let page = await browser.newPage();
-    await page.goto("https://globoleiloes.com.br/leiloes/residenciais/todos-os-residenciais/todos-os-estados/todas-as-cidades");
+    await page.goto("https://www.portalzuk.com.br/");
     res.send(await page.title());
   } catch (err) {
     console.error(err);
