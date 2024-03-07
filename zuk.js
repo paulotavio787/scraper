@@ -70,19 +70,19 @@ async function scrapeAllItems(baseUrl, itemsPerPage = 30) {
   await setupBrowser();
 
   const totalItems = await getTotalItems(baseUrl);
-  const numPages = Math.ceil(totalItems / itemsPerPage);
-  const allItems = [];
+  // const numPages = Math.ceil(totalItems / itemsPerPage);
+  // const allItems = [];
 
-  for (let i = 0; i < numPages; i++) {
-    const start = i * itemsPerPage;
-    const url = `${baseUrl}?start=${start}`;
-    const items = await scrapePage(url);
-    allItems.push(...items);
-  }
+  // for (let i = 0; i < numPages; i++) {
+  //   const start = i * itemsPerPage;
+  //   const url = `${baseUrl}?start=${start}`;
+  //   const items = await scrapePage(url);
+  //   allItems.push(...items);
+  // }
 
   await page.close();
   await browser.close();
-  return allItems;
+  return `${totalItems}`;
 }
 
 const baseUrl = "https://www.portalzuk.com.br/leilao-de-imoveis";
