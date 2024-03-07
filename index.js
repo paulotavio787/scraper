@@ -39,15 +39,15 @@ const {scrapeAllItems} = require("./zuk.js")
 //   }
 // });
 
-app.get("/google", async (req, res) => {
+app.get("/zuk", async (req, res) => {
   try {
     const baseUrl = "https://www.portalzuk.com.br/leilao-de-imoveis";
     const allItems = await scrapeAllItems(baseUrl);
-    res.json(allItems)
-    console.log(allItems.length);
+    console.log(`Items scraped: ${allItems.length}`);
+    res.json(allItems);
   } catch (err) {
     console.error(err);
-    return null;
+    res.status(500).send("Error during scraping operation");
   }
 });
 
